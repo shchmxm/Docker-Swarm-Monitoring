@@ -204,13 +204,13 @@ docker stack ps monitoring
 10. Добавьте Prometheus и Loki в качестве источников данных в Grafana.
     - Для Prometheus:
     Connections > Data Sources > Add New Datasource > Prometheus
-    Установите значение `Prometheus server URL`:
-    http://prometheus:9090
+    
+    Установите значение "Prometheus server URL": `http://prometheus:9090`
 
     - Для Loki:
     Connections > Data Sources > Add New Datasource > Loki
-    Установите значение `Loki server URL`:
-    http://loki:3100
+    
+    Установите значение "Loki server URL": `http://loki:3100`
 
 11. Импортируйте дашборд из репозитория в Grafana:
     Dashboard > New > Import > Upload dashboard JSON file
