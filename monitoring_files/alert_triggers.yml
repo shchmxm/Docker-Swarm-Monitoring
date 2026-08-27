@@ -1,0 +1,32 @@
+groups:
+  - name: alert_rules
+    rules:
+      # Available RAM < 100 Mb
+      - alert: LowRamAvailable
+        expr: node_memory_MemAvailable_bytes / 1024 / 1024 < 100
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Available RAM < 100 MB"
+          description: "Available RAM less than 100 MB on ({{ $labels.instance }}) Current value: {{ $value | humanize }} MB."
+
+      # RAM usage > 1 Gb
+      - alert: HighRamUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) > 1 * 1024 * 1024 * 1024
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "RAM Usage > 1 Гб"
+          description: "RAM Usage more than 1 GB on ({{ $labels.instance }}) Current value: {{ $value | humanize }}%."
+
+      # CPU > 10%
+      - alert: HighServiceCpuUsage
+        expr: sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_swarm_service_name!=""}[1m])) by (container_label_com_docker_swarm_service_name) * 100 > 10
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU Load > 10% in {{ $labels.container_label_com_docker_swarm_service_name }}"
+          description: "CPU load more than 10% in container {{ $labels.container_label_com_docker_swarm_service_name }} Current value: {{ $value | humanize }}%."

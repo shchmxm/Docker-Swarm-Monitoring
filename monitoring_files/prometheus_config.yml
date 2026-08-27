@@ -1,0 +1,56 @@
+global:
+  scrape_interval: 10s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+rule_files: # файл с  правилами алертов
+  - "alerts.yml"
+
+scrape_configs:
+  - job_name: 'microservices-micrometer'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: 
+          - 'session:8081'
+          - 'hotel:8082'
+          - 'booking:8083'
+          - 'payment:8084'
+          - 'loyalty:8085'
+          - 'report:8086'
+          - 'gateway:8087'
+
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['mq:15692']
+
+  - job_name: 'cadvisor'
+    dns_sd_configs:
+      - names:
+          - 'tasks.monitoring_cadvisor' 
+        type: 'A'
+        port: 8080
+
+  - job_name: 'node-exporter'
+    dns_sd_configs:
+      - names:
+          - 'tasks.monitoring_node-exporter' 
+        type: 'A'
+        port: 9100
+
+  - job_name: 'blackbox-exporter-http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # проверяем HTTP 200
+    static_configs:
+      - targets:
+          - 'https://google.com' 
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: monitoring_blackbox-exporter:9115

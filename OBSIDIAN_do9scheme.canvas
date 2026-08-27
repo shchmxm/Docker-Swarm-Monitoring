@@ -1,0 +1,30 @@
+{
+	"nodes":[
+		{"id":"c4490c92c5c76c81","type":"group","x":-40,"y":-840,"width":920,"height":658,"label":"pull-модель сбора метрик"},
+		{"id":"0c6e6d478fe8c94d","type":"group","x":170,"y":-80,"width":617,"height":320,"label":"push-модель сбора логов"},
+		{"id":"e71a890b3c8138fc","type":"text","text":"microservice","x":-537,"y":-140,"width":160,"height":60},
+		{"id":"2383a0707642f2b3","type":"text","text":"grafana","x":1100,"y":-140,"width":120,"height":60},
+		{"id":"a5a3d261d8bbc3a2","type":"text","text":"micrometer\nпозволяет твоему Spring Boot приложению генерировать стандартные метрики без привязки к Prometheus.\nПубликуются на `http://мой_микросервис:8080/actuator/prometheus`","x":-15,"y":-804,"width":240,"height":354},
+		{"id":"14db97ad8430cff7","type":"text","text":"node_exporter\nлоги системы\nпубликуются на `node_exporter:9100/metrics`","x":240,"y":-767,"width":180,"height":175},
+		{"id":"31486f1be773dc7e","type":"text","text":"cAdvisor\nметрики каждого контейнера в Swarm (CPU, RAM, сеть, перезапуски).\nПубликуются на `cadvisor:8080/metrics`","x":440,"y":-760,"width":185,"height":255},
+		{"id":"d27160b3af38f30c","type":"text","text":"blackbox_exporter\nактивно проверяет доступность сервисов по API (HTTP 200, TCP порт открыт, SSL срок).\nПубликуются на `blackbox:9115/probe`","x":640,"y":-720,"width":187,"height":320},
+		{"id":"de0dc4680f6c085e","type":"text","text":"prometheus server","x":290,"y":-260,"width":250,"height":60},
+		{"id":"3ecb07bdd31f2f69","type":"text","text":"loki","x":367,"y":155,"width":125,"height":60},
+		{"id":"3c0552c1714d3761","type":"text","text":"Агент (например fluent bit/promtail)\nзабирает логи из `/var/log/docker/containers/*`","x":275,"y":-40,"width":308,"height":150},
+		{"id":"75675977c3c8d0eb","type":"text","text":"файл","x":-55,"y":-15,"width":115,"height":50},
+		{"id":"59380e3f2e44f9dc","type":"text","text":"`/metrics` http-endpoint\nлоги приложения (дублируется с локи?)","x":-20,"y":-400,"width":250,"height":100}
+	],
+	"edges":[
+		{"id":"e5fb4829d7ab390c","fromNode":"e71a890b3c8138fc","fromSide":"right","toNode":"a5a3d261d8bbc3a2","toSide":"left"},
+		{"id":"4a26e9bffb3e678e","fromNode":"de0dc4680f6c085e","fromSide":"right","toNode":"2383a0707642f2b3","toSide":"left"},
+		{"id":"630ee65408ca3fc8","fromNode":"3c0552c1714d3761","fromSide":"bottom","toNode":"3ecb07bdd31f2f69","toSide":"top"},
+		{"id":"5772856d9df343dd","fromNode":"a5a3d261d8bbc3a2","fromSide":"bottom","toNode":"59380e3f2e44f9dc","toSide":"top"},
+		{"id":"001109756b11e77e","fromNode":"3ecb07bdd31f2f69","fromSide":"right","toNode":"2383a0707642f2b3","toSide":"left","label":"push"},
+		{"id":"571fb0e372467a33","fromNode":"de0dc4680f6c085e","fromSide":"top","toNode":"59380e3f2e44f9dc","toSide":"bottom","label":"pull"},
+		{"id":"641efa4d63916774","fromNode":"de0dc4680f6c085e","fromSide":"top","toNode":"14db97ad8430cff7","toSide":"bottom"},
+		{"id":"3593eceee530be24","fromNode":"de0dc4680f6c085e","fromSide":"top","toNode":"31486f1be773dc7e","toSide":"bottom"},
+		{"id":"e09591f4435b730b","fromNode":"de0dc4680f6c085e","fromSide":"top","toNode":"d27160b3af38f30c","toSide":"bottom"},
+		{"id":"435e1335a7361553","fromNode":"e71a890b3c8138fc","fromSide":"right","toNode":"75675977c3c8d0eb","toSide":"left","label":"stdout"},
+		{"id":"cbea06be4f5d9d83","fromNode":"3c0552c1714d3761","fromSide":"left","toNode":"75675977c3c8d0eb","toSide":"right"}
+	]
+}

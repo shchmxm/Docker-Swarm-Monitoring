@@ -1,0 +1,13 @@
+# Secrets, tokens, passwords
+*.password
+*.secret
+initVM_files/token
+
+# Env
+*.env
+
+# Vagrant folder
+.vagrant
+
+# Logs
+*.log

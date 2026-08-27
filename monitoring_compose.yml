@@ -1,0 +1,187 @@
+---
+services:
+  prometheus:
+    image: prom/prometheus:main-distroless
+    volumes:
+      - ./monitoring_files/prometheus_config.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring_files/alert_triggers.yml:/etc/prometheus/alerts.yml
+      - prometheus-data:/prometheus
+    ports:
+      - target: 9090
+        published: 9090
+        protocol: tcp
+        mode: overlay
+    networks:
+      - microservice_app_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        delay: 10s
+        max_attempts: 3
+        window: 20s
+
+  loki:
+    image: grafana/loki:3.7
+    volumes:
+      - loki-data:/loki
+    ports:
+      - target: 3100
+        published: 3100
+        protocol: tcp
+        mode: overlay
+    networks:
+      - microservice_app_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        delay: 10s
+        max_attempts: 3
+        window: 20s
+
+  alloy:
+    image: grafana/alloy:v1.16.1
+    command: ["run", "/etc/alloy/config.alloy", "--storage.path=/var/lib/alloy/data", "--server.http.listen-addr=0.0.0.0:12345"]
+    volumes:
+      - ./monitoring_files/alloy_config.alloy:/etc/alloy/config.alloy
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    ports:
+      - target: 12345
+        published: 12345
+        protocol: tcp
+        mode: host
+    networks:
+      - microservice_app_network
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        delay: 10s
+        max_attempts: 3
+        window: 20s
+
+  node-exporter:
+    image: prom/node-exporter:master-distroless
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - microservice_app_network
+    deploy:
+      mode: global
+      restart_policy:
+        delay: 10s
+        max_attempts: 3
+        window: 20s
+
+  cadvisor:
+    image: ghcr.io/google/cadvisor:0.57.0
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - microservice_app_network
+    deploy:
+      mode: global
+      restart_policy:
+        delay: 10s
+        max_attempts: 3
+        window: 20s
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter:master-distroless
+    command:
+      - '--config.file=/etc/blackbox_exporter/config.yml'
+      - '--log.level=info'
+    ports:
+      - target: 9115
+        published: 9115
+        protocol: tcp
+        mode: host
+    networks:
+      - microservice_app_network
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        delay: 10s
+        max_attempts: 3
+        window: 20s
+
+  grafana:
+    image: grafana/grafana:11.6.15-ubuntu
+    ports:
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: overlay
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - microservice_app_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        delay: 10s
+        max_attempts: 3
+        window: 20s
+
+  alertmanager:
+    image: prom/alertmanager:v0.33.0
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring_files/alertmanager_config.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager-data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    networks:
+      - microservice_app_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+volumes:
+  prometheus-data:
+  loki-data:
+  grafana-data:
+  alertmanager-data:
+
+networks:
+  microservice_app_network:
+    external: true
+    name: microservice_microservice_app_network
+...
