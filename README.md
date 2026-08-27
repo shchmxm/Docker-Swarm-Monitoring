@@ -204,10 +204,12 @@ The default login credentials are:
 10. Add Prometheus and Loki as data sources in Grafana.
     - For Prometheus:
     Connections > Data Sources > Add New Datasource > Prometheus
+    
     Set "Prometheus server URL" to: `http://prometheus:9090`
 
     - For Loki:
     Connections > Data Sources > Add New Datasource > Loki
+    
     Set "Loki server URL" to: `http://loki:3100`
 
 11. Import the dashboard from the repository to Grafana: 
